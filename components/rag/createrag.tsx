@@ -3,10 +3,15 @@ import {
     Plus, Wrench, Search, Edit3, CheckCircle2, AlertCircle,
     Loader2, Database, Terminal, UserSquare2, X, FileUp, Activity
 } from 'lucide-react';
+import { Toast } from "primereact/toast";
+import { useRef } from "react";
+import { createRagApi, updateRagById } from '@/service/tool_service';
 
 const CreateRag = (props) => {
-    const [formData, setFormData] = useState({id: 0, name: '', description: '', status: 'active' });
+    const [formData, setFormData] = useState({ id: 0, name: '', description: '', creator_name: 'Admin', status: 'active', files: [] });
     const [loading, setLoading] = useState(false);
+    const toast = useRef<Toast>(null);
+    const [addedFiles, setAddedFiles] = useState<Array<File>>([]);
 
     useEffect(() => {
         if (props.formData) {
@@ -14,18 +19,45 @@ const CreateRag = (props) => {
         }
     }, [props.formData]);
 
+    const filesToBase64 = async (files: File[]): Promise<any[]> => {
+        const promises = Array.from(files).map(file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+
+            reader.onload = () => {
+                const result = reader.result;
+                if (typeof result === "string") {
+                    const base64Data = result.split(',')[1];
+                    resolve({
+                        file_name: file.name,
+                        file_data: base64Data,
+                        mime_type: file.type || "application/octet-stream"
+                    });
+                } else {
+                    reject(new Error("FileReader result is not a string"));
+                }
+            };
+
+            reader.onerror = error => reject(error);
+        }));
+
+        return Promise.all(promises);
+    };
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         try {
-            // // let res = await createRagApi(formData);
-            // let res = await mockService.create('rag', formData);
-            // if (res) {
-            //     await props.fetchData();
-            //     props.onClose();
-            // }
+            const filesPayload = await filesToBase64(addedFiles);
+            const payload = { ...formData, files: filesPayload };
+            formData.id ? await updateRagById(formData.id, payload) : await createRagApi(payload);
+            toast.current?.show({ severity: 'success', summary: 'Success', detail: `RAG "${formData.name}" saved successfully.`, life: 3000 });
+            await props.fetchData();
+            props.onClose();
         } catch (error) {
-            console.error("Failed to save RAG", error);
+            console.log("Failed to save RAG", error);
+            toast.current?.show({ severity: 'error', summary: 'Error', detail: `Failed to save RAG "${formData.name}".`, life: 3000 });
         } finally {
             setLoading(false);
         }
@@ -35,8 +67,9 @@ const CreateRag = (props) => {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <Toast ref={toast} position="top-right" />
             <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={props.onClose} />
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md relative z-10 overflow-hidden">
+            <div style={{ color: 'black' }} className="bg-white rounded-2xl shadow-2xl w-full max-w-md relative z-10 overflow-hidden">
                 <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                     <h3 className="text-lg font-bold text-slate-800">{formData.id ? 'Edit RAG Source' : 'Create New RAG'}</h3>
                     <button onClick={props.onClose} className="text-slate-400 hover:text-slate-600"><X className="w-5 h-5" /></button>
@@ -55,7 +88,11 @@ const CreateRag = (props) => {
                     <div>
                         <label className="block text-sm font-semibold text-slate-700 mb-1">Upload Data</label>
                         <div className="border-2 border-dashed border-slate-200 rounded-xl p-6 flex flex-col items-center justify-center bg-slate-50 hover:bg-emerald-50 cursor-pointer transition-colors">
-                            <FileUp className="w-8 h-8 text-slate-300 mb-2" />
+                            <input
+                                type="file"
+                                multiple
+                                onChange={e => setAddedFiles(Array.from(e.target.files))}
+                            />
                             <p className="text-xs text-slate-500">Drag and drop files to index</p>
                         </div>
                     </div>

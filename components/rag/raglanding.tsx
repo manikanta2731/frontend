@@ -4,6 +4,12 @@ import {
     Loader2, Database, Terminal, UserSquare2, X, FileUp, Activity
 } from 'lucide-react';
 import CreateRag from './createrag';
+import { IconButton } from '@mui/material';
+import { Toast } from "primereact/toast";
+import { useRef } from "react";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import { deleteRagById, getAllRags } from '@/service/tool_service';
 
 
 const RagLanding = () => {
@@ -11,21 +17,32 @@ const RagLanding = () => {
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
+    const toast = useRef<Toast>(null);
 
     useEffect(() => { fetchItems(); }, []);
 
     const fetchItems = async () => {
         setLoading(true);
         try {
-            // const res = await getAllRag();
-            // const res = await mockService.getAll('rag');
-            // setItems(res || []);
+            const res =  await getAllRags();
+            setItems(res || []);
         } catch (e) { console.error(e); }
         finally { setLoading(false); }
     };
 
+    const deleteRag = async (rag) => {
+        try {
+            await deleteRagById(rag.id);
+            setItems(items.filter(i => i.id !== rag.id));
+            toast.current?.show({ severity: 'success', summary: 'Deleted', detail: `RAG "${rag.name}" deleted successfully.`, life: 3000 });
+        } catch (e) {
+            console.error(e);
+            toast.current?.show({ severity: 'error', summary: 'Error', detail: `Failed to delete RAG "${rag.name}".`, life: 3000 });
+        }
+    };
+
     const handleOpenCreate = () => {
-        setSelectedItem({ name: '', description: '', status: 'active' });
+        setSelectedItem({ name: '', description: '', status: 'active', creator_name: 'Admin', files: []});
         setIsModalOpen(true);
     };
 
@@ -36,6 +53,7 @@ const RagLanding = () => {
 
     return (
         <div className="p-6 max-w-7xl mx-auto">
+            <Toast ref={toast} position="top-right" />
             <header className="flex justify-between items-center mb-8">
                 <div>
                     <h2 className="text-3xl font-bold text-slate-800">RAG Knowledge</h2>
@@ -54,7 +72,14 @@ const RagLanding = () => {
                         <div key={item.id} className="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-lg transition-all">
                             <div className="flex justify-between mb-4">
                                 <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg"><Database /></div>
-                                <button onClick={() => handleOpenEdit(item)} className="p-2 text-slate-400 hover:text-emerald-600 transition-colors"><Edit3 className="w-5 h-5" /></button>
+                                <div>
+                                    <IconButton style={{color: 'black'}} onClick={() => { handleOpenEdit(item)  }}>
+                                        <EditIcon/>
+                                    </IconButton>
+                                    <IconButton style={{color: 'red'}} onClick={() => { deleteRag(item); }}>
+                                        <DeleteOutlineIcon />
+                                    </IconButton>
+                                 </div>
                             </div>
                             <h3 className="font-bold text-slate-800">{item.name}</h3>
                             <p className="text-sm text-slate-500 mt-2 line-clamp-2">{item.description}</p>

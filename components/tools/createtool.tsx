@@ -1,4 +1,4 @@
-import { createToolApi } from '@/service/backend_service';
+import { createToolApi } from '@/service/tool_service';
 import {
     X
 } from 'lucide-react';

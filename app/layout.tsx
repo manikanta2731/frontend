@@ -1,5 +1,8 @@
-import SPAHost from "./[[...slug]]/page";
+import SPAHost from "./page";
 import "./globals.css";
+import "primereact/resources/themes/lara-light-indigo/theme.css";
+import "primereact/resources/primereact.min.css";
+import "primeicons/primeicons.css";
 
 export const metadata = {
   title: "MCP Platform",

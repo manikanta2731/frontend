@@ -10,7 +10,7 @@ import {
     AlertCircle,
     Loader2
 } from 'lucide-react';
-import { getAllTools } from '@/service/backend_service';
+import { getAllTools } from '@/service/tool_service';
 import CreateTool from './createtool';
 
 const ToolLanding = () => {

@@ -1,8 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect , useRef} from 'react';
 import {
     Plus, Wrench, Search, Edit3, CheckCircle2, AlertCircle,
     Loader2, Database, Terminal, UserSquare2, X, FileUp, Activity
 } from 'lucide-react';
+import { createAgentApi, updateAgentById } from '@/service/tool_service';
+import {
+    MenuItem,
+    TextField
+} from '@mui/material';
+import { Toast } from 'primereact/toast';
 
 
 const LinkingToggle = ({ label, items, activeIds, onToggle, icon: Icon, color }) => (
@@ -32,11 +38,12 @@ const LinkingToggle = ({ label, items, activeIds, onToggle, icon: Icon, color })
 const CreateAgent = (props) => {
     const [formData, setFormData] = useState({
         id: 0,
-        name: '', description: '',
-        linkedTools: [], linkedRag: [], linkedPrompts: [],
+        name: '', description: '', system_prompt: '', llm_provider: '',
+        tool_ids: [], rag_ids: [], prompt_ids: [], creator_name: 'Admin',
         status: 'active'
     });
     const [loading, setLoading] = useState(false);
+    const toast = useRef<Toast>(null);
 
     useEffect(() => {
         if (props.formData) setFormData(props.formData);
@@ -52,10 +59,13 @@ const CreateAgent = (props) => {
         e.preventDefault();
         setLoading(true);
         try {
-            // await mockService.create('agents', formData);
-            // await props.fetchData();
+            formData?.id ? await updateAgentById(formData.id, formData) : await createAgentApi(formData);
+            toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Agent ' + (formData?.id ? 'updated' : 'created') + ' successfully.', life: 3000 });
+            await props.fetchData();
             props.onClose();
-        } catch (e) { console.error(e); }
+        } catch (e) { console.error(e);
+            toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Failed to save agent.', life: 3000 });
+         }
         finally { setLoading(false); }
     };
 
@@ -63,8 +73,9 @@ const CreateAgent = (props) => {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <Toast ref={toast} position="top-right" />
             <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={props.onClose} />
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl relative z-10 flex flex-col max-h-[90vh]">
+            <div style={{ color: 'black' }} className="bg-white text-slate-900 rounded-2xl shadow-2xl w-full max-w-2xl relative z-10 flex flex-col max-h-[90vh]">
                 <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                     <h3 className="text-xl font-bold">Agent Configuration</h3>
                     <button onClick={props.onClose} className="text-slate-400"><X /></button>
@@ -81,12 +92,43 @@ const CreateAgent = (props) => {
                             <textarea rows={2} className="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
                                 placeholder="Main purpose of this agent..." value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
                         </div>
+
+                        <div className="col-span-2">
+                            <label className="block text-sm font-semibold mb-1">System Prompt</label>
+                            <textarea rows={8} className="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                                placeholder="Main purpose of this agent..." value={formData.system_prompt} onChange={e => setFormData({ ...formData, system_prompt: e.target.value })} />
+                        </div>
                     </div>
 
                     <div className="space-y-4">
-                        <LinkingToggle label="Link Tools" items={props.availableData?.tools || []} activeIds={formData.linkedTools} onToggle={id => toggleLink('linkedTools', id)} icon={Wrench} color="bg-indigo-600" />
-                        <LinkingToggle label="Link Knowledge (RAG)" items={props.availableData?.rag || []} activeIds={formData.linkedRag} onToggle={id => toggleLink('linkedRag', id)} icon={Database} color="bg-emerald-600" />
-                        <LinkingToggle label="Link Core Prompts" items={props.availableData?.prompts || []} activeIds={formData.linkedPrompts} onToggle={id => toggleLink('linkedPrompts', id)} icon={Terminal} color="bg-amber-600" />
+                        <LinkingToggle label="Link Tools" items={props.availableData?.tools || []} activeIds={formData.tool_ids} onToggle={id => toggleLink('tool_ids', id)} icon={Wrench} color="bg-indigo-600" />
+                        <LinkingToggle label="Link Knowledge (RAG)" items={props.availableData?.rag || []} activeIds={formData.rag_ids} onToggle={id => toggleLink('rag_ids', id)} icon={Database} color="bg-emerald-600" />
+                        <LinkingToggle label="Link Core Prompts" items={props.availableData?.prompts || []} activeIds={formData.prompt_ids} onToggle={id => toggleLink('prompt_ids', id)} icon={Terminal} color="bg-amber-600" />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+
+                        <div className="col-span-2">
+                            <label className="block text-sm font-semibold mb-1">LLM Provider</label>
+                            <TextField
+                                select
+                                fullWidth
+                                variant="outlined"
+                                value={formData.llm_provider}
+                                onChange={e => setFormData({ ...formData, llm_provider: e.target.value })}
+                            >
+                                {props?.availableData?.llms?.map((llm) => (
+                                    <MenuItem key={llm.id} value={llm.model}>
+                                        {llm.provider} - {llm.model}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </div>
+                        <div className="col-span-2">
+                            <label className="block text-sm font-semibold mb-1">Creator Name</label>
+                            <textarea rows={2} className="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                                placeholder="Main purpose of this agent..." value={formData.creator_name} onChange={e => setFormData({ ...formData, creator_name: e.target.value })} />
+                        </div>
                     </div>
 
                     <div className="flex gap-3 pt-4 sticky bottom-0 bg-white pb-2">

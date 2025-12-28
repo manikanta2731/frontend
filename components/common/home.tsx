@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
-import { callMCPClientAgent, getAllAgents } from '@/service/backend_service';
+import { callMCPClientAgent, getAllAgents } from '@/service/tool_service';
 
 const HomePage = () => {
   const [messages, setMessages] = useState<any>([
@@ -38,8 +38,8 @@ const HomePage = () => {
     const getAgents = async () =>{
         try{
             let res : any = await getAllAgents();
-            if ( res && res?.data && res?.data?.length > 0) {
-                setAgentsList(res.data);
+            if ( res && res?.length > 0) {
+                setAgentsList(res);
             }
             console.log("agents res ",res)
         }catch (e) {
