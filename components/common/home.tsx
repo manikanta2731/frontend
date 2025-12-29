@@ -79,7 +79,7 @@ const HomePage = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen max-w-6xl mx-auto bg-white overflow-hidden shadow-2xl border-x font-sans">
+    <div className="flex flex-col h-screen mx-auto bg-white overflow-hidden shadow-2xl border-x font-sans" style={{ borderRadius:'2%'}}>
       
       {/* --- ADVANCED HEADER --- */}
       <header className="h-16 flex items-center justify-between px-6 border-b bg-white/70 backdrop-blur-xl z-50">

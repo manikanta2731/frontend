@@ -54,7 +54,7 @@ const AgentLanding = () => {
     }
 
     return (
-        <div className="p-6 max-w-7xl mx-auto">
+        <div className="p-6 max-w-7xl mx-auto" >
             <Toast ref={toast} position="top-right" />
             <header className="flex justify-between items-center mb-8">
                 <div>

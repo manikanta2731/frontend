@@ -40,7 +40,7 @@ export default function SPAHost() {
           <Sidebar />
           
           {/* Dynamic Content Area */}
-          <main className="flex-1 overflow-auto">
+          <main className="flex-1 overflow-auto" style={{ padding: '2rem' }}>
             <Routes>
               {/* Main Landing Page */}
               <Route path="/" element={<HomePage />} />
