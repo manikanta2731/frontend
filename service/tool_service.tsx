@@ -300,3 +300,44 @@ export const deleteLLMProviderById = async (id) => {
         return null
     }
 }
+
+
+
+// -------------------- RAG FILES --------------------
+
+export const getRagFilesByRagId = async (ragId) => {
+    try {
+        const response = await AXIOS_INSTANCE.get(`/rags/${ragId}/files`);
+        if (response?.data) {
+            return response.data;
+        }
+        return [];
+    } catch (e) {
+        return [];
+    }
+};
+
+export const deleteRagFileById = async (fileId) => {
+    try {
+        const response = await AXIOS_INSTANCE.delete(`/rags/files/${fileId}`);
+        if (response?.data) {
+            return response.data;
+        }
+        return null;
+    } catch (e) {
+        return null;
+    }
+};
+
+
+export const test_tool_api = async (payload) => {
+    try{
+        const response =  await AXIOS_INSTANCE.post('/tools/test_tool', payload);
+        if (response?.data) {
+            return response.data
+        }
+        return null
+    } catch(e) {
+        return null;
+    }
+}

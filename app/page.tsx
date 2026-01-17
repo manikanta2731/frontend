@@ -6,8 +6,11 @@ import Sidebar from '../components/common/sidebar';
 import HomePage from '../components/common/home';
 import ToolLanding from '@/components/tools/toollanding';
 import PromptLanding from '@/components/prompts/promptlanding';
-import RagLanding from '@/components/rag/raglanding';
 import AgentLanding from '@/components/agents/agentlanding';
+import RagPage from '@/components/rag/raglanding';
+import 'primereact/resources/themes/lara-light-blue/theme.css';
+import 'primereact/resources/primereact.min.css';
+import 'primeicons/primeicons.css';
 
 /**
  * ClientOnly Component
@@ -49,7 +52,7 @@ export default function SPAHost() {
               <Route path="/agents" element={<AgentLanding/>} />
               <Route path="/tools" element={<ToolLanding/>}/>
               <Route path="/prompts" element={<PromptLanding/>} />
-              <Route path="/rag" element={<RagLanding/>} />
+              <Route path="/rag" element={<RagPage/>} />
               <Route path="/runbook" element={<div className="p-8"><h1>Runbooks</h1><p>Automated execution flows.</p></div>} />
               <Route path="/subscriptions" element={<div className="p-8"><h1>Subscriptions</h1><p>Manage your billing and plans.</p></div>} />
               
