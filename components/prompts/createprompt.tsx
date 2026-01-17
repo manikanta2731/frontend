@@ -31,7 +31,7 @@ const CreatePrompt = (props) => {
     if (!props.isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 text-black">
             <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-md" onClick={props.onClose} />
             <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-2xl relative z-10 overflow-hidden animate-in zoom-in duration-300">
                 

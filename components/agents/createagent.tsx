@@ -78,7 +78,7 @@ const CreateAgent = (props) => {
     if (!props.isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 text-black">
             <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={props.onClose} />
             <div className="bg-white rounded-[40px] shadow-2xl w-full max-w-4xl relative z-10 flex flex-col max-h-[92vh] overflow-hidden border border-slate-100 animate-in zoom-in duration-300">
 
