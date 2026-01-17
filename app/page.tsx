@@ -11,6 +11,7 @@ import RagPage from '@/components/rag/raglanding';
 import 'primereact/resources/themes/lara-light-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
+import RunbookPage from '@/components/common/runbook';
 
 /**
  * ClientOnly Component
@@ -53,7 +54,7 @@ export default function SPAHost() {
               <Route path="/tools" element={<ToolLanding/>}/>
               <Route path="/prompts" element={<PromptLanding/>} />
               <Route path="/rag" element={<RagPage/>} />
-              <Route path="/runbook" element={<div className="p-8"><h1>Runbooks</h1><p>Automated execution flows.</p></div>} />
+              <Route path="/runbook" element={<RunbookPage />} />
               <Route path="/subscriptions" element={<div className="p-8"><h1>Subscriptions</h1><p>Manage your billing and plans.</p></div>} />
               
               {/* 404 Fallback */}
